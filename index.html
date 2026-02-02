@@ -1,0 +1,21 @@
+<form id="uploadForm">
+  <input type="file" name="image" required />
+  <button type="submit">Remove Background</button>
+</form>
+
+<img id="result" />
+
+<script>
+document.getElementById("uploadForm").onsubmit = async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+
+  const res = await fetch("/remove-bg", {
+    method: "POST",
+    body: formData
+  });
+
+  const blob = await res.blob();
+  document.getElementById("result").src = URL.createObjectURL(blob);
+};
+</script>
