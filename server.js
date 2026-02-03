@@ -20,18 +20,16 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(path.resolve(), "public", "index.html"));
 });
 
-// Remove background endpoint (supports PNG or WebP)
+// Remove background endpoint
 app.post("/remove-bg", upload.single("image"), async (req, res) => {
   try {
     if (!req.file) return res.status(400).send("No image uploaded");
 
-    // Decide format
     const type = req.query.type === "webp" ? "webp" : "png";
 
-    // Prepare request to remove.bg
     const form = new FormData();
     form.append("image_file", fs.createReadStream(req.file.path));
-    form.append("size", "original");
+    form.append("size", "original"); // keeps original dimensions
     form.append("format", type);
 
     const response = await fetch("https://api.remove.bg/v1.0/removebg", {
@@ -47,7 +45,6 @@ app.post("/remove-bg", upload.single("image"), async (req, res) => {
 
     const buffer = Buffer.from(await response.arrayBuffer());
 
-    // Send as proper PNG/WebP
     res.setHeader("Content-Type", `image/${type}`);
     res.setHeader(
       "Content-Disposition",
@@ -55,13 +52,12 @@ app.post("/remove-bg", upload.single("image"), async (req, res) => {
     );
     res.send(buffer);
 
-    fs.unlinkSync(req.file.path); // cleanup temp upload
+    fs.unlinkSync(req.file.path); // cleanup
   } catch (err) {
     console.error(err);
     res.status(500).send("Background removal failed");
   }
 });
 
-// Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log("Server running on port " + PORT));
