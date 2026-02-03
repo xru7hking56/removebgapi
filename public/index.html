@@ -4,33 +4,54 @@
   <title>Background Remover</title>
 </head>
 <body>
+  <h2>Background Remover</h2>
 
-<h2>Background Remover</h2>
+  <form id="form">
+    <input type="file" name="image" accept="image/*" required />
+    <br><br>
+    <label>
+      Output format:
+      <select id="format">
+        <option value="png">PNG (lossless)</option>
+        <option value="webp">WebP</option>
+      </select>
+    </label>
+    <br><br>
+    <button type="submit">Remove Background</button>
+  </form>
 
-<form id="form">
-  <input type="file" name="image" accept="image/*" required />
-  <br><br>
-  <button type="submit">Remove Background</button>
-</form>
+  <br>
+  <a id="downloadLink" style="display:none" download="result.png">Download Result</a>
+  <br>
+  <img id="result" style="max-width: 400px; display:block;" />
 
-<br><br>
-<img id="result" style="max-width: 400px;" />
+  <script>
+    const form = document.getElementById("form");
+    const resultImg = document.getElementById("result");
+    const downloadLink = document.getElementById("downloadLink");
 
-<script>
-document.getElementById("form").onsubmit = async (e) => {
-  e.preventDefault();
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      const fileInput = form.querySelector('input[name="image"]');
+      const format = document.getElementById("format").value;
 
-  const formData = new FormData(e.target);
+      const formData = new FormData();
+      formData.append("image", fileInput.files[0]);
 
-  const res = await fetch("/remove-bg", {
-    method: "POST",
-    body: formData
-  });
+      const res = await fetch(`/remove-bg?type=${format}`, {
+        method: "POST",
+        body: formData
+      });
 
-  const blob = await res.blob();
-  document.getElementById("result").src = URL.createObjectURL(blob);
-};
-</script>
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      resultImg.src = url;
 
+      downloadLink.href = url;
+      downloadLink.download = `result.${format}`;
+      downloadLink.style.display = "inline";
+      downloadLink.textContent = `Download result.${format}`;
+    };
+  </script>
 </body>
 </html>
