@@ -31,7 +31,7 @@ app.post("/remove-bg", upload.single("image"), async (req, res) => {
     // Prepare request to remove.bg
     const form = new FormData();
     form.append("image_file", fs.createReadStream(req.file.path));
-    form.append("size", "auto");
+    form.append("size", "original");
     form.append("format", type);
 
     const response = await fetch("https://api.remove.bg/v1.0/removebg", {
