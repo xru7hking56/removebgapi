@@ -29,7 +29,7 @@ app.post("/remove-bg", upload.single("image"), async (req, res) => {
 
     const form = new FormData();
     form.append("image_file", fs.createReadStream(req.file.path));
-    form.append("size", "hd"); // keeps original dimensions
+    form.append("size", "preview"); // keeps original dimensions
     form.append("format", type);
 
     const response = await fetch("https://api.remove.bg/v1.0/removebg", {
