@@ -12,7 +12,7 @@
     <label>
       Output format:
       <select id="format">
-        <option value="png">PNG (lossless)</option>
+        <option value="png">PNG (lossless, original size)</option>
         <option value="webp">WebP</option>
       </select>
     </label>
@@ -35,6 +35,11 @@
       const fileInput = form.querySelector('input[name="image"]');
       const format = document.getElementById("format").value;
 
+      if (!fileInput.files[0]) {
+        alert("Please select an image");
+        return;
+      }
+
       const formData = new FormData();
       formData.append("image", fileInput.files[0]);
 
@@ -42,6 +47,12 @@
         method: "POST",
         body: formData
       });
+
+      if (!res.ok) {
+        const text = await res.text();
+        alert("Error: " + text);
+        return;
+      }
 
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
